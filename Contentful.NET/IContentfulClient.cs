@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Contentful.NET.DataModels;
-using Contentful.NET.Exceptions;
 using Contentful.NET.Search;
 using Contentful.NET.Search.Enums;
 
@@ -41,5 +40,34 @@ namespace Contentful.NET
             IEnumerable<ISearchFilter> searchFilters = null, string orderByProperty = null,
             OrderByDirection? orderByDirection = null, int? skip = null, int? limit = null, int? includeLevels = null)
             where T : IContentfulItem, new();
+
+        /// <summary>
+        /// Perform an initial synchronization of the space for the given type. (Not supported by preview api).
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The content that was synchronized.</returns>
+        /// <exception cref="System.NotSupportedException">An attempt was made to sync using a preview instance.</exception>
+        Task<SynchronizationResult<T>> InitialSyncAsync<T>(CancellationToken cancellationToken) where T : ILocalizedContentfulItem, new();
+
+        /// <summary>
+        /// Use a synchronization token to get updated content.
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="syncToken">The synchronize token.</param>
+        /// <returns>The content that was synchronized.</returns>
+        /// <exception cref="System.NotSupportedException">An attempt was made to sync using a preview instance.</exception>
+        Task<SynchronizationResult<T>> SyncAsync<T>(CancellationToken cancellationToken, string syncToken) where T : ILocalizedContentfulItem, new();
+
+        /// <summary>
+        /// Follow the <see cref="SynchronizationResult{T}.NextPageUrl"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="syncResult">The synchronize result.</param>
+        /// <returns>The content that was synchronized.</returns>
+        /// <exception cref="System.NotSupportedException">An attempt was made to sync using a preview instance.</exception>
+        Task<SynchronizationResult<T>> GetNextSyncResultAsync<T>(CancellationToken cancellationToken, SynchronizationResult<T> syncResult) where T : ILocalizedContentfulItem, new();
     }
 }

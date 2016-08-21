@@ -86,6 +86,97 @@ namespace Contentful.NET
         }
 
         /// <summary>
+        /// Perform an initial synchronization of the space for the given type. (Not supported by preview api).
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// The content that was synchronized.
+        /// </returns>
+        /// <exception cref="NotSupportedException">The preview api cannot be used to perform sync operations.</exception>
+        public async Task<SynchronizationResult<T>> InitialSyncAsync<T>(CancellationToken cancellationToken) where T : ILocalizedContentfulItem, new()
+        {
+            if (this._preview)
+            {
+                throw new NotSupportedException("The preview api cannot be used to perform sync operations.");
+            }
+
+            var endpointUrl = RestEndpointResolver.GetEndpointUrl<Space>(this._space);
+
+            var requestUrl = GetRequestUrl(Path.Combine(endpointUrl, $"sync?initial=true&type={RestEndpointResolver.GetContentfulItemTypeName<T>()}"));
+
+            var result = await MakeGetRequestAsync(requestUrl, cancellationToken);
+
+            return await GetItemAsync<SynchronizationResult<T>>(result);
+        }
+
+        /// <summary>
+        /// Use a synchronization token to get updated content.
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="syncToken">The synchronize token.</param>
+        /// <returns>
+        /// The content that was synchronized.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">No sync token was provided.</exception>
+        /// <exception cref="NotSupportedException"></exception>
+        public async Task<SynchronizationResult<T>> SyncAsync<T>(CancellationToken cancellationToken, string syncToken) where T : ILocalizedContentfulItem, new()
+        {
+            if (string.IsNullOrEmpty(syncToken))
+            {
+                throw new ArgumentNullException(nameof(syncToken), "No sync token was provided.");
+            }
+
+            if (this._preview)
+            {
+                throw new NotSupportedException("The preview api cannot be used to perform sync operations.");
+            }
+
+            var endpointUrl = RestEndpointResolver.GetEndpointUrl<Space>(this._space);
+
+            var requestUrl = GetRequestUrl(Path.Combine(endpointUrl, $"sync?sync_token={syncToken}"));
+
+            var result = await MakeGetRequestAsync(requestUrl, cancellationToken);
+
+            return await GetItemAsync<SynchronizationResult<T>>(result);
+        }
+
+        /// <summary>
+        /// Follow the <see cref="SynchronizationResult{T}.NextPageUrl" />.
+        /// </summary>
+        /// <typeparam name="T">The type of content to sync.</typeparam>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="syncResult">The synchronize result.</param>
+        /// <returns>
+        /// The content that was synchronized.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">No syncResult was proided.</exception>
+        /// <exception cref="NotSupportedException">The preview api cannot be used to perform sync operations.</exception>
+        /// <exception cref="InvalidOperationException">There is no SynchronizationResult<T>.NextPageUrl to follow.</exception>
+        public async Task<SynchronizationResult<T>> GetNextSyncResultAsync<T>(CancellationToken cancellationToken, SynchronizationResult<T> syncResult) where T : ILocalizedContentfulItem, new()
+        {
+            if (syncResult == null)
+            {
+                throw new ArgumentNullException(nameof(syncResult));
+            }
+
+            if (this._preview)
+            {
+                throw new NotSupportedException("The preview api cannot be used to perform sync operations.");
+            }
+
+            if (!syncResult.HasMoreResults)
+            {
+                throw new InvalidOperationException($"There is no {nameof(SynchronizationResult<T>.NextPageUrl)} to follow");
+            }
+            
+            var result = await MakeGetRequestAsync(syncResult.NextPageUrl, cancellationToken);
+
+            return await GetItemAsync<SynchronizationResult<T>>(result);
+        }
+
+        /// <summary>
         /// Makes a get request to a URL and handles the result from Contentful
         /// </summary>
         /// <param name="url">The URL to send the request to</param>

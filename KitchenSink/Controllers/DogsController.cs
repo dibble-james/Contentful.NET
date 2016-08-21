@@ -8,6 +8,7 @@ using Contentful.NET.DataModels;
 using Contentful.NET.Search;
 using Contentful.NET.Search.Filters;
 using KitchenSink.Models.Dogs;
+using Newtonsoft.Json;
 
 namespace KitchenSink.Controllers
 {
@@ -24,15 +25,15 @@ namespace KitchenSink.Controllers
         // GET: All Dogs
         public async Task<ActionResult> AllAsync(CancellationToken cancellationToken)
         {
-            
+
             var results = await _contentfulClient.SearchAsync<Entry>(cancellationToken, new[]
             {
                 // Only search for the 'Dog' content type
                 new EqualitySearchFilter(BuiltInProperties.ContentType, "3KzwWGrzry422cEkMCA2o6"),
-            }, 
+            },
             includeLevels: 1 // Ensure we retrieve the linked assets inside this one request - we want to get the Images for the dogs too
             );
-            
+
             return View(GetAllDogsFromContentfulResult(results));
         }
 
@@ -50,6 +51,32 @@ namespace KitchenSink.Controllers
             ViewBag.FromSearch = true;
             ViewBag.Criteria = criteria;
             return View("All", GetAllDogsFromContentfulResult(results));
+        }
+        
+        // GET: /dogs/sync{?syncToken=}
+        public async Task<ActionResult> SyncAsync(CancellationToken cancellationToken, string syncToken)
+        {
+            SynchronizationResult<LocalizedAsset> result;
+
+            if (string.IsNullOrEmpty(syncToken))
+            {
+                result = await _contentfulClient.InitialSyncAsync<LocalizedAsset>(cancellationToken);
+            }
+            else
+            {
+                result = await this._contentfulClient.SyncAsync<LocalizedAsset>(cancellationToken, syncToken);
+            }
+
+            var items = result.Items;
+
+            while (result.HasMoreResults)
+            {
+                result = await _contentfulClient.GetNextSyncResultAsync(cancellationToken, result);
+
+                items.Concat(result.Items);
+            }
+
+            return Content(JsonConvert.SerializeObject(new { items, result.NextSyncUrl }), "application/json");
         }
 
         private static All GetAllDogsFromContentfulResult(SearchResult<Entry> results)
@@ -90,11 +117,11 @@ namespace KitchenSink.Controllers
 
         public async Task<ActionResult> DetailAsync(string id, CancellationToken cancellationToken)
         {
-            var searchResults = await _contentfulClient.SearchAsync<Entry>(cancellationToken, new []
+            var searchResults = await _contentfulClient.SearchAsync<Entry>(cancellationToken, new[]
             {
                 // Only search for the ID of this dog
-                new EqualitySearchFilter(BuiltInProperties.SysId, id), 
-            }, includeLevels:1); // We COULD do a Get instead of a Search here, but only a Search includes linked assets
+                new EqualitySearchFilter(BuiltInProperties.SysId, id),
+            }, includeLevels: 1); // We COULD do a Get instead of a Search here, but only a Search includes linked assets
             if (searchResults.Total == 0) return HttpNotFound();
             var result = searchResults.Items.First();
             // Retrieve any linked pictures
@@ -110,7 +137,7 @@ namespace KitchenSink.Controllers
                 NumberAvailable = result.GetType<int>("numberAvailable"),
                 // Get a thumbnail AND a large image for each picture
                 Pictures = allPictures == null ? null : allPictures
-                    .Select(pic => new {pic.SystemProperties.Id})
+                    .Select(pic => new { pic.SystemProperties.Id })
                     .Select(
                         pic =>
                             new
@@ -133,9 +160,9 @@ namespace KitchenSink.Controllers
                  *     ImageUrl = searchResults.Includes.Assets.First(asset => asset.SystemProperties.Id == pic.SystemProperties.Id).Details.File.Url
                  * })
                  * 
-                 */ 
+                 */
             };
-            
+
             return View(model);
         }
     }

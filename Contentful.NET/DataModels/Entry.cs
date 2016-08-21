@@ -6,7 +6,7 @@ namespace Contentful.NET.DataModels
     /// <summary>
     /// Representation of a Contentful Entry
     /// </summary>
-    public class Entry : ContentfulItemBase, IContentfulItem
+    public class Entry : ContentfulItemBase, ILocalizedContentfulItem
     {
         /// <summary>
         /// A dynamic representation of the entire Entry JSON object. Use this to access any

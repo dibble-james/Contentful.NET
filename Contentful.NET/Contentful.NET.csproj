@@ -47,7 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContentfulClient.cs" />
+    <Compile Include="DataModels\LocalizedAsset.cs" />
     <Compile Include="DataModels\Asset.cs" />
+    <Compile Include="DataModels\LocalizedAssetDetails.cs" />
     <Compile Include="DataModels\AssetDetails.cs" />
     <Compile Include="DataModels\ContentfulItemBase.cs" />
     <Compile Include="DataModels\ContentType.cs" />
@@ -55,12 +57,14 @@
     <Compile Include="DataModels\ErrorResponse.cs" />
     <Compile Include="DataModels\File.cs" />
     <Compile Include="DataModels\IContentfulItem.cs" />
+    <Compile Include="DataModels\ILocalizedContentfulItem.cs" />
     <Compile Include="DataModels\Includes.cs" />
     <Compile Include="DataModels\Link.cs" />
     <Compile Include="DataModels\Locale.cs" />
     <Compile Include="DataModels\Location.cs" />
     <Compile Include="DataModels\SearchResult.cs" />
     <Compile Include="DataModels\Space.cs" />
+    <Compile Include="DataModels\SynchronizationResult.cs" />
     <Compile Include="DataModels\SystemProperties.cs" />
     <Compile Include="Exceptions\ContentfulException.cs" />
     <Compile Include="HttpClientWrapper.cs" />

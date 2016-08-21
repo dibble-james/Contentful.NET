@@ -64,6 +64,9 @@
     <Compile Include="..\Contentful.NET\DataModels\IContentfulItem.cs">
       <Link>DataModels\IContentfulItem.cs</Link>
     </Compile>
+    <Compile Include="..\Contentful.NET\DataModels\ILocalizedContentfulItem.cs">
+      <Link>DataModels\ILocalizedContentfulItem.cs</Link>
+    </Compile>
     <Compile Include="..\Contentful.NET\DataModels\Includes.cs">
       <Link>DataModels\Includes.cs</Link>
     </Compile>
@@ -73,6 +76,12 @@
     <Compile Include="..\Contentful.NET\DataModels\Locale.cs">
       <Link>DataModels\Locale.cs</Link>
     </Compile>
+    <Compile Include="..\Contentful.NET\DataModels\LocalizedAsset.cs">
+      <Link>DataModels\LocalizedAsset.cs</Link>
+    </Compile>
+    <Compile Include="..\Contentful.NET\DataModels\LocalizedAssetDetails.cs">
+      <Link>DataModels\LocalizedAssetDetails.cs</Link>
+    </Compile>
     <Compile Include="..\Contentful.NET\DataModels\Location.cs">
       <Link>DataModels\Location.cs</Link>
     </Compile>
@@ -81,6 +90,9 @@
     </Compile>
     <Compile Include="..\Contentful.NET\DataModels\Space.cs">
       <Link>DataModels\Space.cs</Link>
+    </Compile>
+    <Compile Include="..\Contentful.NET\DataModels\SynchronizationResult.cs">
+      <Link>DataModels\SynchronizationResult.cs</Link>
     </Compile>
     <Compile Include="..\Contentful.NET\DataModels\SystemProperties.cs">
       <Link>DataModels\SystemProperties.cs</Link>

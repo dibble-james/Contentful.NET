@@ -25,6 +25,14 @@ namespace Contentful.NET
             { typeof(Space), ""}
         };
 
+        // Hardcoded mapping of IContentItems which have a corresponding type name
+        private static readonly Dictionary<Type, string> ContentfulItemTypeNameDictionary = new Dictionary<Type, string>
+        {
+            { typeof(Asset), "Asset"},
+            { typeof(LocalizedAsset), "Asset"},
+            { typeof(Entry), "Entrty"}
+        };
+
         /// <summary>
         /// Gets the endpoint for a given IContentfulItem type
         /// </summary>
@@ -36,6 +44,16 @@ namespace Contentful.NET
         {
 			string host = preview ? ContentfulPreviewHost : ContentfulProductionHost;
             return string.Format(ContentfulApiBase + EndpointDictionary[typeof (T)], host, space);
+        }
+
+        /// <summary>
+        /// Gets the name of the Contentful item type to use in a URI filter..
+        /// </summary>
+        /// <typeparam name="T">The type of Contentful item.</typeparam>
+        /// <returns>The item type name.</returns>
+        internal static string GetContentfulItemTypeName<T>() where T : IContentfulItem
+        {
+            return ContentfulItemTypeNameDictionary[typeof(T)];
         }
     }
 }
